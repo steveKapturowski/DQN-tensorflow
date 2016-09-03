@@ -1,5 +1,6 @@
 import cv2
 import gym
+import time
 import random
 import numpy as np
 
@@ -72,7 +73,12 @@ class GymEnvironment(Environment):
 
     for _ in xrange(self.action_repeat):
       self._step(action)
+
       cumulated_reward = cumulated_reward + self.reward
+
+      if not is_training:
+        time.sleep(.015)
+        self.after_act(action)
 
       if is_training and start_lives > self.lives:
         cumulated_reward -= 1
@@ -82,8 +88,9 @@ class GymEnvironment(Environment):
         break
 
     self.reward = cumulated_reward
+    if is_training:
+      self.after_act(action)
 
-    self.after_act(action)
     return self.state
 
 class SimpleGymEnvironment(Environment):

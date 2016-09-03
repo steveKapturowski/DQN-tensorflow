@@ -17,7 +17,7 @@ class AgentConfig(object):
 
   ep_end = 0.1
   ep_start = 1.
-  ep_end_t = memory_size
+  ep_end_t = 5000000
 
   history_length = 4
   train_frequency = 4
@@ -30,7 +30,7 @@ class AgentConfig(object):
   dueling = False
 
   _test_step = 5 * scale
-  _save_step = _test_step * 10
+  _save_step = _test_step * 4
 
 class EnvironmentConfig(object):
   env_name = 'Breakout-v0'
@@ -47,7 +47,7 @@ class DQNConfig(AgentConfig, EnvironmentConfig):
 class M1(DQNConfig):
   backend = 'tf'
   env_type = 'detail'
-  action_repeat = 1
+  action_repeat = 4
 
 def get_config(FLAGS):
   if FLAGS.model == 'm1':

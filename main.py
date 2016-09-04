@@ -22,6 +22,7 @@ flags.DEFINE_string('gpu_fraction', '1/1', 'idx / # of gpu fraction e.g. 1/3, 2/
 flags.DEFINE_boolean('display', False, 'Whether to do display the game screen or not')
 flags.DEFINE_boolean('is_train', True, 'Whether to do training or testing')
 flags.DEFINE_integer('random_seed', 123, 'Value of random seed')
+flags.DEFINE_float('test_epsilon', 0.0, 'Value of epsilon to use during test play')
 
 FLAGS = flags.FLAGS
 
@@ -52,7 +53,7 @@ def main(_):
     else:
       env = GymEnvironment(config)
 
-    if not FLAGS.use_gpu:
+    if not FLAGS.use_gpu: 
       config.cnn_format = 'NHWC'
 
     agent = Agent(config, env, sess)
@@ -60,7 +61,7 @@ def main(_):
     if FLAGS.is_train:
       agent.train()
     else:
-      agent.play()
+      agent.play(test_ep=FLAGS.test_epsilon)
 
 if __name__ == '__main__':
   tf.app.run()

@@ -63,7 +63,9 @@ class Agent(BaseModel):
 
         if self.step-step_at_last_reward > 5000:
           self.env.reset()
-          print 'Commencing Reset!'
+          print
+          print 'Warning: Agent may be stuck - Commencing reset!'
+
         screen, reward, action, terminal = self.env.new_random_game()
 
         num_game += 1

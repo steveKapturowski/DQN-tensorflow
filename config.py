@@ -19,7 +19,7 @@ class AgentConfig(object):
   ep_start = 1.
   ep_end_t = 500 * scale
 
-  # frame_skip = (3,5)
+  frame_skip = (3,5)
   history_length = 4
   train_frequency = 4
   learn_start = 5. * scale

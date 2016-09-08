@@ -59,7 +59,11 @@ class Agent(BaseModel):
       if reward != 0.0:
         step_at_last_reward = self.step
 
-      if terminal or self.step-step_at_last_reward > 10000:
+      if terminal or self.step-step_at_last_reward > 5000:
+
+        if self.step-step_at_last_reward > 5000:
+          self.env.reset()
+          print 'Commencing Reset!'
         screen, reward, action, terminal = self.env.new_random_game()
 
         num_game += 1

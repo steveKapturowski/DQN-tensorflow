@@ -59,7 +59,6 @@ class Agent(BaseModel):
       if reward != 0.0:
         step_at_last_reward = self.step
 
-      print self.step-step_at_last_reward, step_at_last_reward
       if terminal or self.step-step_at_last_reward > 10000:
         screen, reward, action, terminal = self.env.new_random_game()
 

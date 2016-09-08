@@ -11,6 +11,9 @@ class Environment(object):
     screen_width, screen_height, self.action_repeat, self.random_start = \
         config.screen_width, config.screen_height, config.action_repeat, config.random_start
 
+    self.env.frameskip = config.frame_skip
+    print self.env.frameskip
+
     self.display = config.display
     self.dims = (screen_width, screen_height)
 

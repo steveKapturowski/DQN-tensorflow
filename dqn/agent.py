@@ -31,6 +31,7 @@ class Agent(BaseModel):
   def train(self):
     start_step = self.step_op.eval()
     start_time = time.time()
+    step_at_last_reward = 0
 
     num_game, self.update_count, ep_reward = 0, 0, 0.
     total_reward, self.total_loss, self.total_q = 0., 0., 0.
@@ -55,11 +56,15 @@ class Agent(BaseModel):
       # 3. observe
       self.observe(screen, reward, action, terminal)
 
-      if terminal:
+      if reward != 0.0:
+        step_at_last_reward = self.step
+
+      if terminal or self.step-step_at_last_reward > 10000:
         screen, reward, action, terminal = self.env.new_random_game()
 
         num_game += 1
         ep_rewards.append(ep_reward)
+        step_at_last_reward = self.step
         ep_reward = 0.
       else:
         ep_reward += reward
@@ -112,10 +117,25 @@ class Agent(BaseModel):
           ep_rewards = []
           actions = []
 
+
+  def _init_pseudocounts(self):
+    '''
+    N^hat_n(x) = p_n(x) (1 - p'_n(x)) / (p'_n(x) - p_n(x))
+    '''
+    pass
+
+
+  def update_pseudocounts(self, state):
+    pass
+
   def predict(self, s_t, test_ep=None):
     ep = test_ep or (self.ep_end +
         max(0., (self.ep_start - self.ep_end)
           * (self.ep_end_t - max(0., self.step - self.learn_start)) / self.ep_end_t))
+    # ep = 0.0
+    # take action based on novelty
+
+
 
     if random.random() < ep:
       action = random.randrange(self.env.action_size)
@@ -129,6 +149,12 @@ class Agent(BaseModel):
 
     self.history.add(screen)
     self.memory.add(screen, reward, action, terminal)
+
+    # record novelty of new state
+
+    novelty_reward = self.update_pseudocounts(screen)
+
+    
 
     if self.step > self.learn_start:
       if self.step % self.train_frequency == 0:
@@ -201,14 +227,12 @@ class Agent(BaseModel):
 
       if self.dueling:
         self.value_hid, self.w['l4_val_w'], self.w['l4_val_b'] = \
-            linear(self.l3_flat, 512, activation_fn=activation_fn, name='value_hid')
-
-        self.adv_hid, self.w['l4_adv_w'], self.w['l4_adv_b'] = \
-            linear(self.l3_flat, 512, activation_fn=activation_fn, name='adv_hid')
-
+          linear(self.l3_flat, 512, activation_fn=activation_fn, name='value_hid')
         self.value, self.w['val_w_out'], self.w['val_w_b'] = \
           linear(self.value_hid, 1, name='value_out')
 
+        self.adv_hid, self.w['l4_adv_w'], self.w['l4_adv_b'] = \
+          linear(self.l3_flat, 512, activation_fn=activation_fn, name='adv_hid')
         self.advantage, self.w['adv_w_out'], self.w['adv_w_b'] = \
           linear(self.adv_hid, self.env.action_size, name='adv_out')
 
@@ -249,13 +273,11 @@ class Agent(BaseModel):
       if self.dueling:
         self.t_value_hid, self.t_w['l4_val_w'], self.t_w['l4_val_b'] = \
             linear(self.target_l3_flat, 512, activation_fn=activation_fn, name='target_value_hid')
-
-        self.t_adv_hid, self.t_w['l4_adv_w'], self.t_w['l4_adv_b'] = \
-            linear(self.target_l3_flat, 512, activation_fn=activation_fn, name='target_adv_hid')
-
         self.t_value, self.t_w['val_w_out'], self.t_w['val_w_b'] = \
           linear(self.t_value_hid, 1, name='target_value_out')
 
+        self.t_adv_hid, self.t_w['l4_adv_w'], self.t_w['l4_adv_b'] = \
+            linear(self.target_l3_flat, 512, activation_fn=activation_fn, name='target_adv_hid')
         self.t_advantage, self.t_w['adv_w_out'], self.t_w['adv_w_b'] = \
           linear(self.t_adv_hid, self.env.action_size, name='target_adv_out')
 

@@ -7,18 +7,20 @@ from config import get_config
 
 flags = tf.app.flags
 
+#python main.py --env_name=BattleZone-v0 --is_train=True --use_gpu=True --dueling=True --double_q=True --gpu_fraction=9/10 --action_repeat=4 --display=False
+
 # Model
 flags.DEFINE_string('model', 'm1', 'Type of model')
-flags.DEFINE_boolean('dueling', False, 'Whether to use dueling deep q-network')
-flags.DEFINE_boolean('double_q', False, 'Whether to use double q-learning')
+flags.DEFINE_boolean('dueling', True, 'Whether to use dueling deep q-network')
+flags.DEFINE_boolean('double_q', True, 'Whether to use double q-learning')
 
 # Environment
 flags.DEFINE_string('env_name', 'Breakout-v0', 'The name of gym environment to use')
-flags.DEFINE_integer('action_repeat', 4, 'The number of action to be repeated')
+flags.DEFINE_integer('action_repeat', 3, 'The number of action to be repeated')
 
 # Etc
 flags.DEFINE_boolean('use_gpu', True, 'Whether to use gpu or not')
-flags.DEFINE_string('gpu_fraction', '1/1', 'idx / # of gpu fraction e.g. 1/3, 2/3, 3/3')
+flags.DEFINE_string('gpu_fraction', '9/10', 'idx / # of gpu fraction e.g. 1/3, 2/3, 3/3')
 flags.DEFINE_boolean('display', False, 'Whether to do display the game screen or not')
 flags.DEFINE_boolean('is_train', True, 'Whether to do training or testing')
 flags.DEFINE_integer('random_seed', 123, 'Value of random seed')
